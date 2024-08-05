@@ -1,6 +1,8 @@
 import sqlite3
 from datetime import datetime
 
+# todo: gut, продолжить также, остальные функции писать
+
 
 class BudgetDB:
     def __init__(self, db_name='budget.db'):
@@ -9,7 +11,7 @@ class BudgetDB:
 
     def connect(self):
         self.conn = sqlite3.connect(self.db_name)
-        self.create_tables()
+        #self.create_tables()
 
     def create_tables(self):
         with self.conn:
