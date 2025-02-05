@@ -1,7 +1,7 @@
 import sqlite3
 from datetime import datetime
-
-# todo: gut, продолжить также, остальные функции писать
+import easyocr
+import re
 
 
 class BudgetDB:
@@ -45,6 +45,30 @@ class BudgetDB:
     def close(self):
         if self.conn:
             self.conn.close()
+
+    def easy_ocr_statements(self, path_to_img, bank_name, reader, direction):
+        """
+        OCR bank statements screenshots
+        :param direction: credit/ debit
+        :param reader: reader object of easy ocr or another
+        :param path_to_img: path to screenshot
+        :param bank_name: name of the bank to choose pattern
+        :return:
+        """
+        result = reader.readtext(path_to_img, detail=0)
+
+        if bank_name == 'sber' and direction == 'credit':
+            return re.sub(r"[^0-9.]", "", result[-2].replace(',', '.'))
+        elif bank_name == 'ya' and direction == 'debit':
+            deb_list = list(set([re.sub(r'[^0-9.]', '', el.replace(',', '.'))
+                                 for el in result if '₽' in el and '+' not in el]))
+            if len(deb_list) > 1:
+                print(f'More than 1 digit is recognized: {len(deb_list)}')
+            return deb_list[0]
+        else:
+            pass
+
+
 
 # Example usage:
 # if __name__ == "__main__":
